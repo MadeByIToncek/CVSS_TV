@@ -32,18 +32,25 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_h2yge")
 
-[node name="Left" type="Control" parent="."]
+[node name="Designs" type="ReferenceRect" parent="."]
+visible = false
+layout_mode = 0
+offset_right = 5148.0
+offset_bottom = 2913.0
+border_width = 0.0
+
+[node name="Left" type="Control" parent="Designs"]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="ReferenceRect" type="ReferenceRect" parent="Left"]
+[node name="ReferenceRect" type="ReferenceRect" parent="Designs/Left"]
 layout_mode = 0
 offset_right = 2560.0
 offset_bottom = 1440.0
 border_width = 4.0
 
-[node name="TextureRect" type="TextureRect" parent="Left"]
+[node name="TextureRect" type="TextureRect" parent="Designs/Left"]
 self_modulate = Color(0, 0.333333, 0, 1)
 layout_mode = 0
 offset_right = 3840.0
@@ -51,16 +58,16 @@ offset_bottom = 2160.0
 scale = Vector2(0.667, 0.667)
 texture = ExtResource("2_h2yge")
 
-[node name="Teamname" type="Label" parent="Left"]
+[node name="Teamname" type="Label" parent="Designs/Left"]
 layout_mode = 0
 offset_left = 100.0
-offset_top = 970.0
+offset_top = 950.0
 offset_right = 1360.0
-offset_bottom = 1366.0
+offset_bottom = 1346.0
 text = "Filmáci"
 label_settings = SubResource("LabelSettings_1bvp3")
 
-[node name="Score" type="Label" parent="Left"]
+[node name="Score" type="Label" parent="Designs/Left"]
 layout_mode = 0
 offset_left = 1570.0
 offset_top = 60.0
@@ -69,28 +76,28 @@ offset_bottom = 1116.0
 text = "99"
 label_settings = SubResource("LabelSettings_272bh")
 
-[node name="ByCentrumDeti" type="TextureRect" parent="Left"]
+[node name="ByCentrumDeti" type="TextureRect" parent="Designs/Left"]
 layout_mode = 0
-offset_left = 132.0
-offset_top = 153.0
-offset_right = 2692.0
-offset_bottom = 827.0
+offset_left = 80.0
+offset_top = 70.0
+offset_right = 2640.0
+offset_bottom = 744.0
 scale = Vector2(0.333, 0.333)
 texture = ExtResource("5_7mycd")
 
-[node name="Right" type="Control" parent="."]
+[node name="Right" type="Control" parent="Designs"]
 anchors_preset = 0
 offset_left = 2560.0
 offset_right = 2600.0
 offset_bottom = 40.0
 
-[node name="ReferenceRect" type="ReferenceRect" parent="Right"]
+[node name="ReferenceRect" type="ReferenceRect" parent="Designs/Right"]
 layout_mode = 0
 offset_right = 2560.0
 offset_bottom = 1440.0
 border_width = 4.0
 
-[node name="TextureRect" type="TextureRect" parent="Right"]
+[node name="TextureRect" type="TextureRect" parent="Designs/Right"]
 self_modulate = Color(0.333333, 0, 0, 1)
 layout_mode = 0
 offset_right = 3840.0
@@ -98,16 +105,16 @@ offset_bottom = 2160.0
 scale = Vector2(0.667, 0.667)
 texture = ExtResource("2_h2yge")
 
-[node name="Teamname" type="Label" parent="Right"]
+[node name="Teamname" type="Label" parent="Designs/Right"]
 layout_mode = 0
 offset_left = 1020.0
-offset_top = 970.0
+offset_top = 950.0
 offset_right = 2460.0
-offset_bottom = 1366.0
+offset_bottom = 1346.0
 text = "Roboťáci"
 label_settings = SubResource("LabelSettings_1bvp3")
 
-[node name="Score" type="Label" parent="Right"]
+[node name="Score" type="Label" parent="Designs/Right"]
 layout_mode = 0
 offset_left = 30.0
 offset_top = 60.0
@@ -116,29 +123,29 @@ offset_bottom = 1116.0
 text = "01"
 label_settings = SubResource("LabelSettings_272bh")
 
-[node name="ByCentrumDeti" type="TextureRect" parent="Right"]
+[node name="ByCentrumDeti" type="TextureRect" parent="Designs/Right"]
 layout_mode = 0
-offset_left = 1526.0
-offset_top = 153.0
-offset_right = 4086.0
-offset_bottom = 827.0
+offset_left = 1626.67
+offset_top = 70.0
+offset_right = 4186.67
+offset_bottom = 744.0
 scale = Vector2(0.333, 0.333)
 texture = ExtResource("5_7mycd")
 
-[node name="Middle" type="Control" parent="."]
+[node name="Middle" type="Control" parent="Designs"]
 anchors_preset = 0
 offset_left = 1280.0
 offset_top = 1440.0
 offset_right = 1320.0
 offset_bottom = 1480.0
 
-[node name="ReferenceRect" type="ReferenceRect" parent="Middle"]
+[node name="ReferenceRect" type="ReferenceRect" parent="Designs/Middle"]
 layout_mode = 0
 offset_right = 2560.0
 offset_bottom = 1440.0
 border_width = 4.0
 
-[node name="LeftGradient" type="TextureRect" parent="Middle"]
+[node name="LeftGradient" type="TextureRect" parent="Designs/Middle"]
 self_modulate = Color(0, 0.33, 0, 0.501961)
 layout_mode = 0
 offset_right = 3840.0
@@ -146,7 +153,7 @@ offset_bottom = 2160.0
 scale = Vector2(0.667, 0.667)
 texture = ExtResource("6_7mycd")
 
-[node name="RightGradient" type="TextureRect" parent="Middle"]
+[node name="RightGradient" type="TextureRect" parent="Designs/Middle"]
 self_modulate = Color(0.33, 0, 0, 0.501961)
 layout_mode = 0
 offset_left = 2560.0
@@ -155,7 +162,7 @@ offset_bottom = 2160.0
 scale = Vector2(-0.667, 0.667)
 texture = ExtResource("6_7mycd")
 
-[node name="Score" type="Label" parent="Middle"]
+[node name="Score" type="Label" parent="Designs/Middle"]
 layout_mode = 0
 offset_left = 387.0
 offset_top = 315.0
@@ -164,7 +171,7 @@ offset_bottom = 1107.0
 text = "01:00"
 label_settings = SubResource("LabelSettings_7mycd")
 
-[node name="ByCentrumDeti" type="TextureRect" parent="Middle"]
+[node name="ByCentrumDeti" type="TextureRect" parent="Designs/Middle"]
 layout_mode = 0
 offset_left = 108.0
 offset_top = 75.0
@@ -173,7 +180,7 @@ offset_bottom = 749.0
 scale = Vector2(0.333, 0.333)
 texture = ExtResource("5_7mycd")
 
-[node name="ByCentrumDeti2" type="TextureRect" parent="Middle"]
+[node name="ByCentrumDeti2" type="TextureRect" parent="Designs/Middle"]
 layout_mode = 0
 offset_left = 1603.0
 offset_top = 75.0
@@ -182,7 +189,7 @@ offset_bottom = 749.0
 scale = Vector2(0.333, 0.333)
 texture = ExtResource("5_7mycd")
 
-[node name="Teamname" type="Label" parent="Middle"]
+[node name="Teamname" type="Label" parent="Designs/Middle"]
 layout_mode = 0
 offset_left = 1619.0
 offset_top = 1094.0
@@ -191,11 +198,11 @@ offset_bottom = 1332.0
 text = "Roboťáci"
 label_settings = SubResource("LabelSettings_5vw27")
 
-[node name="Teamname2" type="Label" parent="Middle"]
+[node name="Teamname2" type="Label" parent="Designs/Middle"]
 layout_mode = 0
-offset_left = 158.0
-offset_top = 1094.0
-offset_right = 1022.0
-offset_bottom = 1332.0
+offset_left = 100.0
+offset_top = 1111.0
+offset_right = 856.0
+offset_bottom = 1349.0
 text = "Filmáci"
 label_settings = SubResource("LabelSettings_5vw27")

@@ -11,7 +11,11 @@ public partial class MainController : Control {
 	private List<Window> _windows = [];
 	private List<IResetableControl> _resetable = [];
 	private ApiHandler _api = new();
+	private WebsocketHandler _wsh;
 	private float _fade = 2;
+	public MainController() {
+		_wsh = new WebsocketHandler(_api);
+	}
 
 	public override void _EnterTree() {
 		#if DEBUG
@@ -55,11 +59,11 @@ public partial class MainController : Control {
 			GetTree().CreateTimer(_fade + 1).Timeout += () => {
 				RemoveChild(_api);
 				_api.QueueFree();
+				_wsh.Remove();
 				foreach (Window w in _windows) {
 					RemoveChild(w);
 					w.QueueFree();
 				}
-
 				GetTree().Quit();
 			};
 		};

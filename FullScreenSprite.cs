@@ -24,7 +24,7 @@ public partial class FullScreenSprite(
 	}
 
 	public void Remove() {
-		Tween tween = GetTree().CreateTween().SetTrans(trans);
+		Tween tween = CreateTween().SetTrans(trans);
 		tween.TweenProperty(_rect, "modulate", new Color(1, 1, 1, 0), fadeDuration);
 		tween.Finished += () => {
 			RemoveChild(_rect);

@@ -14,20 +14,9 @@ public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeD
 	private FullScreenSprite _glow = new("res://gradient.png", Tween.TransitionType.Sine, fadeDuration / 2f);
 	private TextureRect _logo = new();
 
-	private LabelSettings _teamNameSettings = new() {
-		FontSize = 180,
-		Font = GD.Load<FontFile>("res://fonts/regular.ttf")
-	};
-
-	private LabelSettings _scoreSettings = new() {
-		FontSize = 500,
-		Font = GD.Load<FontFile>("res://fonts/bold.ttf")
-	};
-
-	private LabelSettings _timeSettings = new() {
-		FontSize = 700,
-		Font = GD.Load<FontFile>("res://fonts/bold.ttf")
-	};
+	private LabelSettings _teamNameSettings = GenericUtilities.GenerateLabelSettings();
+	private LabelSettings _scoreSettings = GenericUtilities.GenerateLabelSettings(500, "res://fonts/bold.ttf");
+	private LabelSettings _timeSettings = GenericUtilities.GenerateLabelSettings(700, "res://fonts/bold.ttf");
 
 	private int _scoreNumber;
 	private TimeSpan _startTime;
@@ -69,7 +58,7 @@ public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeD
 		_teamName.SetText(_team.Name);
 		_teamName.SetLabelSettings(_teamNameSettings);
 		_teamName.SetPosition(left
-			? new Vector2(-100 - GetStringLength(_team.Name, _teamNameSettings), 1111)
+			? new Vector2(-100 - GenericUtilities.GetStringLength(_team.Name, _teamNameSettings), 1111)
 			: new Vector2(2660, 1111));
 		AddChildAsync(_teamName);
 
@@ -77,7 +66,7 @@ public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeD
 		_score.SetText($"{_scoreNumber:00}");
 		_score.SetLabelSettings(_scoreSettings);
 		_score.SetPosition(left
-			? new Vector2(-100 - GetStringLength($"{_scoreNumber:00}", _scoreSettings), 500)
+			? new Vector2(-100 - GenericUtilities.GetStringLength($"{_scoreNumber:00}", _scoreSettings), 500)
 			: new Vector2(2660, 500));
 		AddChildAsync(_score);
 
@@ -98,20 +87,18 @@ public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeD
 		Tween t = CreateTween().SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
 		//Target teamname
 		t.TweenProperty(_teamName, "position",
-			left ? new Vector2(100, 1111) : new Vector2(2460 - GetStringLength(_team.Name, _teamNameSettings), 1111),
+			left ? new Vector2(100, 1111) : new Vector2(2460 - GenericUtilities.GetStringLength(_team.Name, _teamNameSettings), 1111),
 			fadeDuration / 2);
 		t.Parallel().TweenProperty(_score, "position", left
 			? new Vector2(100, 500)
-			: new Vector2(2460 - GetStringLength($"{_scoreNumber:00}", _scoreSettings), 500), fadeDuration / 2);
+			: new Vector2(2460 - GenericUtilities.GetStringLength($"{_scoreNumber:00}", _scoreSettings), 500), fadeDuration / 2);
 		t.Parallel().TweenProperty(_logo, "modulate", new Color(1, 1, 1), fadeDuration / 2);
 		t.Parallel().TweenInterval(fadeDuration / 2 - fadeDuration / 10);
 		t.TweenProperty(_timePart, "modulate", new Color(1, 1, 1), fadeDuration / 2);
 		t.Parallel().TweenProperty(_doubleDot, "modulate", new Color(1, 1, 1), fadeDuration / 2);
 	}
 
-	private static float GetStringLength(string str, LabelSettings ls) {
-		return ls.Font.GetStringSize(str, fontSize: ls.FontSize).X;
-	}
+	
 
 	private void AddChildAsync(Node node) {
 		CallDeferred("add_child", node);
@@ -127,11 +114,11 @@ public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeD
 		t.Parallel().TweenInterval(fadeDuration / 2 - fadeDuration / 10);
 		t.TweenProperty(_teamName, "position",
 			left
-				? new Vector2(-100 - GetStringLength(_team.Name, _teamNameSettings), 1111)
+				? new Vector2(-100 - GenericUtilities.GetStringLength(_team.Name, _teamNameSettings), 1111)
 				: new Vector2(2660, 1111),
 			fadeDuration / 2);
 		t.Parallel().TweenProperty(_score, "position", left
-			? new Vector2(-100 - GetStringLength($"{_scoreNumber:00}", _scoreSettings), 500)
+			? new Vector2(-100 - GenericUtilities.GetStringLength($"{_scoreNumber:00}", _scoreSettings), 500)
 			: new Vector2(2660, 500), fadeDuration / 2);
 
 		GetTree().CreateTimer(fadeDuration).Timeout += () => {
