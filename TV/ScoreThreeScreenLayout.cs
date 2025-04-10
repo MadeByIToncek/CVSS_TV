@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CVSS_GodotCommons;
+using CVSS_TV.API;
 using Godot;
+using ApiHandler = CVSS_TV.API.ApiHandler;
+using WebsocketHandler = CVSS_TV.API.WebsocketHandler;
 
-namespace CVSS_TV;
+namespace CVSS_TV.TV;
 
 #pragma warning disable CS0162
 public partial class ScoreThreeScreenLayout(
 	ApiHandler api,
+	WebsocketHandler wsh,
 	float fadeDuration,
-	ScoreThreeScreenLayout.ThreeScreenLayoutType type) : Control, IResetableControl {
+	ScoreThreeScreenLayout.ThreeScreenLayoutType type) : Control {
 	private static readonly Vector2I TwoK = new(2560, 1440);
 
 	private Texture2D _centrumDeti = (Texture2D)GD.Load("res://by_centrumdeti.png");
@@ -29,7 +32,7 @@ public partial class ScoreThreeScreenLayout(
 	private int _ls;
 	private int _rs;
 	
-	private LabelSettings _smallTeamNameSettings = GenericUtilities.GenerateLabelSettings(180);
+	private LabelSettings _smallTeamNameSettings = GenericUtilities.GenerateLabelSettings();
 	private LabelSettings _teamNameSettings = GenericUtilities.GenerateLabelSettings(300);
 	private LabelSettings _scoreSettings = GenericUtilities.GenerateLabelSettings(800, "res://fonts/bold.ttf");
 	private LabelSettings _timeSettings = GenericUtilities.GenerateLabelSettings(600, "res://fonts/bold.ttf");
@@ -108,10 +111,10 @@ public partial class ScoreThreeScreenLayout(
 		#region Generate double gradient background
 		
 		_gradient1 = new FullScreenSprite("res://gradient_linear.png", Tween.TransitionType.Sine, fadeDuration / 2f);
-		_gradient1.SetModulate(Half(_leftTeam.ColorBright));
+		_gradient1.SetModulate(_leftTeam.ColorBright);
 		AddChildAsync(_gradient1);
 		_gradient2 = new FullScreenSprite("res://gradient_linear.png", Tween.TransitionType.Sine, fadeDuration / 2f);
-		_gradient2.SetModulate(Half(_rightTeam.ColorBright));
+		_gradient2.SetModulate(_rightTeam.ColorBright);
 		_gradient2.RotationDegrees = 180;
 		_gradient2.Position = TwoK;
 		AddChildAsync(_gradient2);
@@ -122,13 +125,23 @@ public partial class ScoreThreeScreenLayout(
 		SpawnLogo(false);
 		SpawnTeamName(true,true);
 		SpawnTeamName(false,true);
-		
-		
-		//TODO))
+
+		SpawnTeamDisplay();
 	}
 
-	private static Color Half(Color c) {
-		return new Color(c.R, c.G, c.B, c.A / 2f);
+	private void SpawnTeamDisplay() {
+		_mainNumber = new Label();
+		_mainNumber.SetText($"{_startTime.Minutes:00}:{_startTime.Seconds:00}");
+		_mainNumber.SetLabelSettings(_timeSettings);
+		var x = 1280f -
+		        GenericUtilities.GetStringLength($"{_startTime.Minutes:00}:{_startTime.Seconds:00}", _timeSettings) /
+		        2;
+		_mainNumber.SetPosition(new Vector2(x, 333));
+		AddChildAsync(_mainNumber);
+		wsh.TimeReceived += (_, time) => {
+			TimeSpan rem = TimeSpan.FromSeconds(time);
+			_mainNumber.SetText($"{rem.Minutes:00}:{rem.Seconds:00}");
+		};
 	}
 
 	public void Remove() {

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CVSS_GodotCommons;
+using CVSS_TV.API;
 using Godot;
+using ApiHandler = CVSS_TV.API.ApiHandler;
 
-namespace CVSS_TV;
+namespace CVSS_TV.TV;
 
-public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeDuration) : Control, IResetableControl {
+public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeDuration) : Control {
 	private Texture2D _logoTexture;
 	private Label _score = new();
 	private Label _teamName = new();

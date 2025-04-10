@@ -146,7 +146,7 @@ offset_bottom = 1440.0
 border_width = 4.0
 
 [node name="LeftGradient" type="TextureRect" parent="Designs/Middle"]
-self_modulate = Color(0, 0.33, 0, 0.501961)
+self_modulate = Color(0, 0.33, 0, 1)
 layout_mode = 0
 offset_right = 3840.0
 offset_bottom = 2160.0
@@ -154,7 +154,7 @@ scale = Vector2(0.667, 0.667)
 texture = ExtResource("6_7mycd")
 
 [node name="RightGradient" type="TextureRect" parent="Designs/Middle"]
-self_modulate = Color(0.33, 0, 0, 0.501961)
+self_modulate = Color(0.33, 0, 0, 1)
 layout_mode = 0
 offset_left = 2560.0
 offset_right = 6400.0
@@ -164,10 +164,10 @@ texture = ExtResource("6_7mycd")
 
 [node name="Score" type="Label" parent="Designs/Middle"]
 layout_mode = 0
-offset_left = 387.0
-offset_top = 315.0
-offset_right = 2187.0
-offset_bottom = 1107.0
+offset_left = 380.0
+offset_top = 333.0
+offset_right = 2180.0
+offset_bottom = 1125.0
 text = "01:00"
 label_settings = SubResource("LabelSettings_7mycd")
 

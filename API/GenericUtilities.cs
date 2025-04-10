@@ -1,0 +1,17 @@
+﻿using System;
+using Godot;
+
+namespace CVSS_TV.API;
+
+public abstract class GenericUtilities {
+	public static LabelSettings GenerateLabelSettings(int fontSize = 180, String fontPath = "res://fonts/regular.ttf") {
+		return new LabelSettings {
+			FontSize = fontSize,
+			Font = GD.Load<FontFile>(fontPath)
+		};
+	}
+	
+	public static float GetStringLength(string str, LabelSettings ls) {
+		return ls.Font.GetStringSize(str, fontSize: ls.FontSize).X;
+	}
+}

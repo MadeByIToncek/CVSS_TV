@@ -1,11 +1,11 @@
 ﻿using Godot;
 
-namespace CVSS_TV;
+namespace CVSS_TV.TV;
 
 public partial class FullScreenSprite(
 	string path,
 	Tween.TransitionType trans = Tween.TransitionType.Linear,
-	float fadeDuration = 1f) : Control, IResetableControl {
+	float fadeDuration = 1f) : Control {
 	private TextureRect _rect = new();
 	private Texture2D _texture;
 

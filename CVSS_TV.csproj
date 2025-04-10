@@ -3,7 +3,4 @@
         <TargetFramework>net8.0</TargetFramework>
         <EnableDynamicLoading>true</EnableDynamicLoading>
     </PropertyGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\CVSS_GodotCommons\CVSS_GodotCommons.csproj" />
-    </ItemGroup>
 </Project>
