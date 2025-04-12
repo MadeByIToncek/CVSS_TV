@@ -46,6 +46,7 @@ public partial class MainController : Control {
 		GetWindow().SetSize(TwoK);
 		GetWindow().SetCurrentScreen(0);
 		GetWindow().SetTitle("CVSS_TV1");
+		GetWindow().SetPosition(new Vector2I(0, 0));
 		#endif
 		
 		if (DisplayServer.GetName() == "headless") {
