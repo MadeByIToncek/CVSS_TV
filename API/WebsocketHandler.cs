@@ -74,9 +74,9 @@ public partial class WebsocketHandler(ApiHandler api) : Control {
             case WebSocketPeer.State.Open:
                 while (_eventSocket.GetAvailablePacketCount() > 0) {
                     string s = _eventSocket.GetPacket().GetStringFromUtf8();
-                    if (Enum.TryParse(s, true, out Event command)) {
-                        GD.Print($"Received {command}");
-                        EventReceived?.Invoke(this,command);
+                    if (Enum.TryParse(s, true, out Event @event)) {
+                        GD.Print($"Received {@event}");
+                        EventReceived?.Invoke(this,@event);
                     }
                     else {
                         GD.PrintErr($"Unknown command {s}");
@@ -101,7 +101,8 @@ public partial class WebsocketHandler(ApiHandler api) : Control {
             case WebSocketPeer.State.Open:
                 while (_timeSocket.GetAvailablePacketCount() > 0) {
                     string s = _timeSocket.GetPacket().GetStringFromUtf8();
-                    TimeReceived?.Invoke(this,int.Parse(s));
+                    int i = int.Parse(s);
+                    if(i>=0) TimeReceived?.Invoke(this,i);
                 }
                 break;
             case WebSocketPeer.State.Closed:

@@ -16,7 +16,7 @@ namespace CVSS_TV.API;
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")] // no, it can't, this is made to be public across the app!
 public partial class ApiHandler : Control {
-    public readonly Config _cfg;
+    public readonly Config Cfg;
     private readonly HttpClient _scl;
 
     public ApiHandler() {
@@ -25,10 +25,10 @@ public partial class ApiHandler : Control {
         }
         Config? cfg = ReadConfig("api.config");
 
-        _cfg = cfg ?? throw new Exception("Config couldn't be read!");
+        Cfg = cfg ?? throw new Exception("Config couldn't be read!");
         _scl = new HttpClient
         {
-            BaseAddress = new Uri(_cfg.BaseUrl)
+            BaseAddress = new Uri(Cfg.BaseUrl)
         };
     }
 
@@ -41,7 +41,9 @@ public partial class ApiHandler : Control {
         using FileStream stream = File.Create(cfg);
         JsonSerializer.Serialize(stream, new Config {
             BaseUrl = "http://localhost:4444",
-            InstanceId = $"instance-{new Random().Next():x8}"
+            Instances = [
+                $"instance-{new Random().Next():x8}"
+            ]
         });
     }
 
@@ -64,19 +66,23 @@ public partial class ApiHandler : Control {
     }
     
     public string GetOverlayStreamAddress() {
-        return "ws://" + new Uri(_cfg.BaseUrl).GetComponents(UriComponents.HostAndPort,UriFormat.UriEscaped) + "/stream/overlay";
+        return "ws://" + new Uri(Cfg.BaseUrl).GetComponents(UriComponents.HostAndPort,UriFormat.UriEscaped) + "/stream/overlay";
     }
     
     public string GetEventStreamAddress() {
-        return "ws://" + new Uri(_cfg.BaseUrl).GetComponents(UriComponents.HostAndPort,UriFormat.UriEscaped) + "/stream/event";
+        return "ws://" + new Uri(Cfg.BaseUrl).GetComponents(UriComponents.HostAndPort,UriFormat.UriEscaped) + "/stream/event";
     }
     
     public string GetTimeStreamAddress() {
-        return "ws://" + new Uri(_cfg.BaseUrl).GetComponents(UriComponents.HostAndPort,UriFormat.UriEscaped) + "/stream/time";
+        return "ws://" + new Uri(Cfg.BaseUrl).GetComponents(UriComponents.HostAndPort,UriFormat.UriEscaped) + "/stream/time";
     }
-    public async Task<CurrentMatch> GetCurrentMatch() {
+    public async Task<CurrentMatch?> GetCurrentMatch() {
         string left = await _scl.GetStringAsync("/match/leftTeamId");
         string right = await _scl.GetStringAsync("/match/rightTeamId");
+
+        if (left == "-1" || right == "-1") {
+            return null;
+        }
 
         Team leftTeam = await GetTeam(Convert.ToInt32(left));
         Team rightTeam = await GetTeam(Convert.ToInt32(right));
@@ -96,22 +102,10 @@ public partial class ApiHandler : Control {
         return int.Parse(await _scl.GetStringAsync("/defaultMatchLength"));
     }
 
-    public async Task<bool> RegisterGraphics() {
-        using HttpContent c = new StringContent(_cfg.InstanceId);
+    public async Task<bool> RegisterGraphics(int internalId) {
+        using HttpContent c = new StringContent(Cfg.Instances[internalId]);
         using HttpResponseMessage res = await _scl.PostAsync("/overlay/register", c);
         return await res.Content.ReadAsStringAsync() == "ok";
-    }
-    
-    public async Task<bool> ReportReady() {
-        using HttpContent c = new StringContent(_cfg.InstanceId);
-        using HttpResponseMessage res = await _scl.PostAsync("/overlay/report", c);
-        return await res.Content.ReadAsStringAsync() == "ok";
-    }
-
-    public async Task<List<GraphicsInstance>?> ListInstances() {
-        await using Stream stream = await _scl.GetStreamAsync("/overlay/instances");
-        return (await JsonSerializer.DeserializeAsync<List<Responses.GraphicsInstanceResponse>>(stream))?
-            .Select(x => x.ToGraphicsInstance()).ToList();
     }
 
     public async Task<GraphicsInstance> GetGraphicsInstance(string ident) {
@@ -120,8 +114,8 @@ public partial class ApiHandler : Control {
         return (await JsonSerializer.DeserializeAsync<Responses.GraphicsInstanceResponse>(await res.Content.ReadAsStreamAsync())).ToGraphicsInstance();
     }
 
-    public async Task<GraphicsInstance> GetThisGraphicsInstance() {
-        return await GetGraphicsInstance(_cfg.InstanceId);
+    public async Task<GraphicsInstance> GetThisGraphicsInstance(int internalId) {
+        return await GetGraphicsInstance(Cfg.Instances[internalId]);
     }
 
     public async Task<(int leftScore, int rightScore)> GetCurrentMatchScore() {
@@ -136,18 +130,17 @@ public partial class ApiHandler : Control {
 
     // ------------------------------- /HTTP ACCESS METHODS --------------------------------------
     
-    public class Config
+    public struct Config
     {
         public required string BaseUrl { get; init; }
-        public required string InstanceId { get; init; }
+        public string[] Instances { get; set; }
     }
 }
 
-public readonly struct GraphicsInstance(string ident, string nickname, GraphicsMode mode, bool updating) {
+
+public readonly struct GraphicsInstance(string ident, GraphicsMode mode) {
     public string Ident { get; } = ident;
-    public string Nickname { get; } = nickname;
     public GraphicsMode Mode { get; } = mode;
-    public bool Updating { get; } = updating;
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")] // because of java, again 🙄
@@ -233,13 +226,11 @@ public class Responses {
     }
     public readonly struct GraphicsInstanceResponse {
         public string ident { get; init; }
-        public string nickname { get; init; }
         public string mode { get; init; }
-        public bool updating { get; init; }
 
         public GraphicsInstance ToGraphicsInstance() {
             if(Enum.TryParse(mode, true, out GraphicsMode m))
-                return new GraphicsInstance(ident,nickname,m,updating);
+                return new GraphicsInstance(ident,m);
             throw new IOException("Unable to parse mode");
         }
     }

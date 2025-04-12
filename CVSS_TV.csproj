@@ -3,4 +3,12 @@
         <TargetFramework>net8.0</TargetFramework>
         <EnableDynamicLoading>true</EnableDynamicLoading>
     </PropertyGroup>
+    <ItemGroup>
+      <Content Include="lib\Art.Net.dll" />
+    </ItemGroup>
+    <ItemGroup>
+      <Reference Include="Art.Net">
+        <HintPath>lib\Art.Net.dll</HintPath>
+      </Reference>
+    </ItemGroup>
 </Project>

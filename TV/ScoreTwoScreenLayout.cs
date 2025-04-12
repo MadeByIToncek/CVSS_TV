@@ -6,7 +6,7 @@ using ApiHandler = CVSS_TV.API.ApiHandler;
 
 namespace CVSS_TV.TV;
 
-public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeDuration) : Control {
+public partial class ScoreTwoScreenLayout(ApiHandler api, WebsocketHandler wsh, float fadeDuration, bool left) : Display {
 	private Texture2D _logoTexture;
 	private Label _score = new();
 	private Label _teamName = new();
@@ -22,26 +22,36 @@ public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeD
 	private int _scoreNumber;
 	private TimeSpan _startTime;
 	private Team _team;
-
-
+	private bool _disabled;
 	public override async void _Ready() {
-		await SetupVariables();
-		ConfigureSubnodes();
-		AnimatedFadeIn();
+		try {
+		}
+		catch (Exception e) {
+			await Console.Error.WriteLineAsync(e.StackTrace);
+		}
 	}
 
 	private async Task SetupVariables() {
-		CurrentMatch cm = await api.GetCurrentMatch();
 		(int ls, int rs) = await api.GetCurrentMatchScore();
 		_scoreNumber = left ? ls : rs;
 		_startTime = TimeSpan.FromSeconds(await api.GetMatchDuration());
-		_team = left ? cm.LeftTeam : cm.RightTeam;
+		CurrentMatch? cm = await api.GetCurrentMatch();
+		if (cm == null) {
+			GD.PrintErr("Unable to find current match on server!");
+			_disabled = true;
+		}
+		else {
+			_disabled = false;
+			_team = left ? cm.Value.LeftTeam : cm.Value.RightTeam;
+		}
 	}
 
-	private void ConfigureSubnodes() {
-		// Glow
+	public override async Task Init() {
+		await SetupVariables();
+
+		if (_disabled) return;
+
 		_glow.SetModulate(_team.ColorBright);
-		AddChildAsync(_glow);
 
 		// Logo
 		_logoTexture = left
@@ -53,7 +63,6 @@ public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeD
 			? new Vector2(1 / 4f, 1 / 4f)
 			: new Vector2(659f / _logoTexture.GetWidth(), 659f / _logoTexture.GetWidth()));
 		_logo.SetModulate(new Color(1, 1, 1, 0));
-		AddChildAsync(_logo);
 
 		// Team name
 		_teamName.SetText(_team.Name);
@@ -61,7 +70,6 @@ public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeD
 		_teamName.SetPosition(left
 			? new Vector2(-100 - GenericUtilities.GetStringLength(_team.Name, _teamNameSettings), 1111)
 			: new Vector2(2660, 1111));
-		AddChildAsync(_teamName);
 
 		// Score
 		_score.SetText($"{_scoreNumber:00}");
@@ -69,22 +77,30 @@ public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeD
 		_score.SetPosition(left
 			? new Vector2(-100 - GenericUtilities.GetStringLength($"{_scoreNumber:00}", _scoreSettings), 500)
 			: new Vector2(2660, 500));
-		AddChildAsync(_score);
 
 		_timePart.SetText($"{(left ? _startTime.Minutes : _startTime.Seconds):00}");
 		_timePart.SetLabelSettings(_timeSettings);
 		_timePart.SetPosition(left ? new Vector2(1510, 222) : new Vector2(210, 222));
 		_timePart.SetModulate(new Color(1, 1, 1, 0));
-		AddChildAsync(_timePart);
 
 		_doubleDot.SetText(":");
 		_doubleDot.SetLabelSettings(_timeSettings);
 		_doubleDot.SetPosition(left ? new Vector2(2340, 222) : new Vector2(-200, 222));
 		_doubleDot.SetModulate(new Color(1, 1, 1, 0));
-		AddChildAsync(_doubleDot);
-	}
 
-	private void AnimatedFadeIn() {
+		AddChildAsync(_glow);
+		AddChildAsync(_logo);
+		AddChildAsync(_teamName);
+		AddChildAsync(_score);
+		AddChildAsync(_timePart);
+		AddChildAsync(_doubleDot);
+		await _glow.Init();
+		// Glow
+	}
+	
+	public override async Task ShowAnimation() {
+		if(_disabled) return;
+		_glow.ShowAnimation();
 		Tween t = CreateTween().SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
 		//Target teamname
 		t.TweenProperty(_teamName, "position",
@@ -97,17 +113,17 @@ public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeD
 		t.Parallel().TweenInterval(fadeDuration / 2 - fadeDuration / 10);
 		t.TweenProperty(_timePart, "modulate", new Color(1, 1, 1), fadeDuration / 2);
 		t.Parallel().TweenProperty(_doubleDot, "modulate", new Color(1, 1, 1), fadeDuration / 2);
+		
+		await ToSignal(t, Tween.SignalName.Finished);
 	}
 
-	
-
-	private void AddChildAsync(Node node) {
-		CallDeferred("add_child", node);
+	public override async Task UpdateScore() {
+		//todo))
 	}
 
-	public void Remove() {
-		_glow.Remove();
-
+	public override async Task HideAnimation() {
+		if(_disabled) return;
+		_glow.HideAnimation();
 		Tween t = CreateTween().SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.In);
 		t.TweenProperty(_timePart, "modulate", new Color(1, 1, 1, 0), fadeDuration / 2);
 		t.Parallel().TweenProperty(_doubleDot, "modulate", new Color(1, 1, 1, 0), fadeDuration / 2);
@@ -121,13 +137,29 @@ public partial class ScoreTwoScreenLayout(bool left, ApiHandler api, float fadeD
 		t.Parallel().TweenProperty(_score, "position", left
 			? new Vector2(-100 - GenericUtilities.GetStringLength($"{_scoreNumber:00}", _scoreSettings), 500)
 			: new Vector2(2660, 500), fadeDuration / 2);
+		
+		await ToSignal(GetTree().CreateTimer(fadeDuration), SceneTreeTimer.SignalName.Timeout);
+		RemoveChildAsync(_glow);
+		RemoveChildAsync(_logo);
+		RemoveChildAsync(_teamName);
+		RemoveChildAsync(_score);
+		RemoveChildAsync(_timePart);
+		RemoveChildAsync(_doubleDot);
+	}
 
-		GetTree().CreateTimer(fadeDuration).Timeout += () => {
-			_logoTexture.Dispose();
-			_teamNameSettings.Dispose();
-			_timeSettings.Dispose();
-			_scoreSettings.Dispose();
-			QueueFree();
-		};
+	private void AddChildAsync(Node node) {
+		CallDeferred("add_child", node);
+	}
+	private void RemoveChildAsync(Node node) {
+		CallDeferred("remove_child", node);
+	}
+
+	public override void Delete() {
+		_glow?.Delete();
+		_logoTexture?.Dispose();
+		_teamNameSettings?.Dispose();
+		_timeSettings?.Dispose();
+		_scoreSettings?.Dispose();
+		QueueFree();
 	}
 }
