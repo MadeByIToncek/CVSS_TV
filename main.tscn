@@ -33,7 +33,6 @@ grow_vertical = 2
 script = ExtResource("1_h2yge")
 
 [node name="Designs" type="ReferenceRect" parent="."]
-visible = false
 layout_mode = 0
 offset_right = 5148.0
 offset_bottom = 2913.0
